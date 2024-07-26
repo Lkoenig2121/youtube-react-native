@@ -31,7 +31,7 @@ export const shortVideos = [
   },
   {
     id: 3,
-    title: "Tesla's Wireless Charger: Explained!",
+    title: "Women's Workout Recovery",
     viewCount: "2M",
     image: require("../assets/images/short3.png"),
   },

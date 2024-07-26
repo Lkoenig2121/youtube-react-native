@@ -8,10 +8,12 @@ import ShortVideoCard from "../components/shortVideoCard";
 import VideoCard from "../components/videoCard";
 import { fetchTrendingVideos } from "../api/youtube";
 import { StatusBar } from "expo-status-bar";
+import { useNavigation } from "@react-navigation/native";
 
 export default function HomeScreen() {
   const [activeCategory, setActiveCategory] = useState("All");
   const [videos, setVideos] = useState([]);
+  const navigation = useNavigation();
 
   useEffect(() => {
     fetchData();
@@ -22,10 +24,14 @@ export default function HomeScreen() {
     // console.log('video: ',data[0]);
     setVideos(data);
   };
+
+  const goToProfile = () => {
+    navigation.navigate("Profile");
+  };
+
   return (
     <View style={{ backgroundColor: themeColors.bg }} className="flex-1">
       <StatusBar style="light" />
-      {/* logo and profile icon */}
       <SafeAreaView className="flex-row justify-between mx-4">
         <View className="flex-row items-center space-x-1">
           <Image
@@ -36,15 +42,17 @@ export default function HomeScreen() {
             YouTube
           </Text>
         </View>
-        <View className="flex-row items-center space-x-3">
-          <Icon.Cast stroke="white" strokeWidth={1.2} height="22" />
-          <Icon.Bell stroke="white" strokeWidth={1.2} height="22" />
-          <Icon.Search stroke="white" strokeWidth={1.2} height="22" />
-          <Image
-            source={require("../assets/images/avatar.jpg")}
-            className="h-7 w-7 rounded-full"
-          />
-        </View>
+        <TouchableOpacity onPress={goToProfile} style={{ padding: 5 }}>
+          <View className="flex-row items-center space-x-3">
+            <Icon.Cast stroke="white" strokeWidth={1.2} height="22" />
+            <Icon.Bell stroke="white" strokeWidth={1.2} height="22" />
+            <Icon.Search stroke="white" strokeWidth={1.2} height="22" />
+            <Image
+              source={require("../assets/images/avatar.jpg")}
+              className="h-7 w-7 rounded-full"
+            />
+          </View>
+        </TouchableOpacity>
       </SafeAreaView>
 
       <ScrollView className="flex-1 -mt-6" showsVerticalScrollIndicator={false}>
