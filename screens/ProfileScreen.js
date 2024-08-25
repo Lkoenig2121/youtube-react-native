@@ -104,9 +104,21 @@ export default function ProfileScreen() {
           showsHorizontalScrollIndicator={false}
           className="px-4"
         >
-          {videos && videos[2] && <VideoCard video={videos[2]} />}
-          {videos && videos[4] && <VideoCard video={videos[4]} />}
-          {videos && videos[6] && <VideoCard video={videos[6]} />}
+          {videos && videos[2] && (
+            <View className="mr-4">
+              <VideoCard video={videos[2]} />
+            </View>
+          )}
+          {videos && videos[4] && (
+            <View className="mr-4">
+              <VideoCard video={videos[4]} />
+            </View>
+          )}
+          {videos && videos[6] && (
+            <View className="mr-4">
+              <VideoCard video={videos[6]} />
+            </View>
+          )}
         </ScrollView>
       </View>
 
