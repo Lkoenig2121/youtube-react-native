@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { themeColors } from "../theme";
 import * as Icon from "react-native-feather";
-import { categories, shortVideos } from "../constants";
+import { categories, shortVideos, videos as localVideos } from "../constants";
 import ShortVideoCard from "../components/shortVideoCard";
 import VideoCard from "../components/videoCard";
 import { fetchTrendingVideos } from "../api/youtube";
@@ -23,8 +23,16 @@ export default function HomeScreen() {
 
   const fetchData = async () => {
     const data = await fetchTrendingVideos();
-    // console.log('video: ',data[0]);
-    setVideos(data);
+    console.log('Fetched videos count:', data?.length);
+    
+    if (data && data.length > 0) {
+      console.log('First video:', data[0]);
+      setVideos(data);
+    } else {
+      // Use local videos as fallback
+      console.log('Using local videos as fallback');
+      setVideos(localVideos);
+    }
   };
 
   const toggleProfileMenu = () => {
@@ -116,11 +124,19 @@ export default function HomeScreen() {
         </View>
 
         {/* videos */}
-        <ScrollView showsVerticalScrollIndicator={false}>
-          {videos.map((video, index) => (
-            <VideoCard video={video} key={index} />
-          ))}
-        </ScrollView>
+        <View>
+          {videos && videos.length > 0 ? (
+            videos.map((video, index) => (
+              <VideoCard video={video} key={index} />
+            ))
+          ) : (
+            <View className="items-center justify-center py-10">
+              <Text className="text-zinc-400 text-center">
+                Loading videos...
+              </Text>
+            </View>
+          )}
+        </View>
       </ScrollView>
     </View>
   );

@@ -12,11 +12,16 @@ export default function VideoCard({video}) {
       navigation.navigate('Profile', {
         channelId: video.channelId,
         channelTitle: video.channelTitle,
-        channelThumbnail: video.channelThumbnail,
+        channelThumbnail: video.channelThumbnail || video.avatar,
         isOwnChannel: false
       });
     }
   };
+
+  // Handle both API format (lengthText) and local format (duration)
+  const videoDuration = video?.lengthText || video?.duration;
+  // Handle both API format (channelThumbnail) and local format (avatar)
+  const channelAvatar = video?.channelThumbnail || video?.avatar;
 
   return (
     <View>
@@ -24,7 +29,7 @@ export default function VideoCard({video}) {
       <View className="flex items-end mr-2 mb-5 -mt-6">
         <View className="bg-black rounded px-1"> 
             <Text className="text-white font-semibold text-xs">
-                {video && video.lengthText}
+                {videoDuration}
             </Text>
         </View>
         
@@ -32,7 +37,7 @@ export default function VideoCard({video}) {
       <View 
         className="flex-row justify-between items-center pb-5 space-x-3 mx-2">
             <TouchableOpacity onPress={goToChannel}>
-              <Image source={video && video.channelThumbnail} className="h-9 w-9 rounded-full" />
+              <Image source={channelAvatar} className="h-9 w-9 rounded-full" />
             </TouchableOpacity>
             <View className="flex-1 space-y-1">
                 <Text className="text-white font-semibold">

@@ -11,6 +11,7 @@ import {
 import VideoCard from "../components/profileVideoCard";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { fetchTrendingVideos } from "../api/youtube";
+import { videos as localVideos } from "../constants";
 import * as Icon from "react-native-feather";
 import { themeColors } from "../theme";
 import { useNavigation } from "@react-navigation/native";
@@ -35,7 +36,15 @@ export default function ProfileScreen({ route }) {
 
   const fetchData = async () => {
     const data = await fetchTrendingVideos();
-    setVideos(data);
+    console.log('Profile - Fetched videos count:', data?.length);
+    
+    if (data && data.length > 0) {
+      setVideos(data);
+    } else {
+      // Use local videos as fallback
+      console.log('Profile - Using local videos as fallback');
+      setVideos(localVideos);
+    }
   };
 
   const navigation = useNavigation();
