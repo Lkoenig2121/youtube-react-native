@@ -1,8 +1,23 @@
-import { View, Text, Image } from "react-native";
+import { View, Text, Image, TouchableOpacity } from "react-native";
 import React from "react";
 import * as Icon from "react-native-feather";
 import { formatViews } from "../utils/numbers";
+import { useNavigation } from '@react-navigation/native';
+
 export default function VideoCard({ video }) {
+  const navigation = useNavigation();
+
+  const goToChannel = () => {
+    if (video && video.channelId) {
+      navigation.navigate('Profile', {
+        channelId: video.channelId,
+        channelTitle: video.channelTitle,
+        channelThumbnail: video.channelThumbnail,
+        isOwnChannel: false
+      });
+    }
+  };
+
   return (
     <View className="h-64 w-60 pt-3">
       <Image source={video && video.thumbnail} className="h-32 w-full" />

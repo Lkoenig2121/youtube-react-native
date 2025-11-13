@@ -14,11 +14,20 @@ import { fetchTrendingVideos } from "../api/youtube";
 import * as Icon from "react-native-feather";
 import { themeColors } from "../theme";
 import { useNavigation } from "@react-navigation/native";
+import ProfileMenu from "../components/profileMenu";
 
-export default function ProfileScreen() {
-  const [activeButton, setActiveButton] = useState("All");
-  settings = ["Switch Account", "Google Account", "Turn on Incognito"];
+export default function ProfileScreen({ route }) {
+  const [activeButton, setActiveButton] = useState("Videos");
   const [videos, setVideos] = useState([]);
+  const [showProfileMenu, setShowProfileMenu] = useState(false);
+  
+  // Get parameters from navigation
+  const { 
+    channelId = null, 
+    channelTitle = "Lukas Koenig", 
+    channelThumbnail = null,
+    isOwnChannel = true 
+  } = route?.params || {};
 
   useEffect(() => {
     fetchData();
@@ -34,8 +43,18 @@ export default function ProfileScreen() {
     navigation.navigate("Home");
   };
 
+  const toggleProfileMenu = () => {
+    setShowProfileMenu(!showProfileMenu);
+  };
+
+  const profileTabs = ["Videos", "Shorts", "Playlists", "About"];
+
   return (
     <View style={{ backgroundColor: themeColors.bg }} className="flex-1">
+      <ProfileMenu
+        visible={showProfileMenu}
+        onClose={() => setShowProfileMenu(false)}
+      />
       <SafeAreaView className="flex-row justify-between mx-4">
         <TouchableOpacity onPress={goToHome}>
           <View className="flex-row items-center space-x-1">
@@ -52,101 +71,171 @@ export default function ProfileScreen() {
           <Icon.Cast stroke="white" strokeWidth={1.2} height="22" />
           <Icon.Bell stroke="white" strokeWidth={1.2} height="22" />
           <Icon.Search stroke="white" strokeWidth={1.2} height="22" />
-          <Image
-            source={require("../assets/images/avatar.jpg")}
-            className="h-7 w-7 rounded-full"
-          />
+          <TouchableOpacity onPress={toggleProfileMenu}>
+            <Image
+              source={require("../assets/images/avatar.jpg")}
+              className="h-7 w-7 rounded-full"
+            />
+          </TouchableOpacity>
         </View>
       </SafeAreaView>
-      <View className="flex-row space-x-3">
-        <Image
-          source={require("../assets/images/avatar.jpg")}
-          className="h-20 w-20 rounded-full"
-        />
 
-        <View>
-          <Text className="text-white text-3xl">Lukas Koenig</Text>
-          <Text className="text-stone-400 text-xl">
-            @LukasKoenig - View Channel
-          </Text>
+      
+      {/* Channel Header */}
+      <View className="mx-4 mt-4">
+        <View className="flex-row space-x-4 items-center">
+          <Image
+            source={
+              channelThumbnail && !isOwnChannel 
+                ? channelThumbnail 
+                : require("../assets/images/avatar.jpg")
+            }
+            className="h-24 w-24 rounded-full"
+          />
+          <View className="flex-1">
+            <Text className="text-white text-2xl font-bold">{channelTitle}</Text>
+            <Text className="text-zinc-400 text-sm mt-1">
+              @{channelTitle.replace(/\s+/g, '')}
+            </Text>
+            <Text className="text-zinc-400 text-sm mt-1">
+              256K subscribers • 89 videos
+            </Text>
+          </View>
         </View>
+        
+        {/* Subscribe/Edit Profile Button */}
+        <TouchableOpacity 
+          className="mt-4 bg-red-600 rounded-full py-2 px-6 items-center"
+        >
+          <Text className="text-white font-semibold text-base">
+            {isOwnChannel ? "Edit Profile" : "Subscribe"}
+          </Text>
+        </TouchableOpacity>
       </View>
 
-      <View className="py-3 pb-3">
+      {/* Tabs */}
+      <View className="mt-6 border-b border-zinc-700">
         <ScrollView
           className="px-4"
           horizontal
           showsHorizontalScrollIndicator={false}
         >
-          {settings.map((button, index) => {
-            let isActive = button == activeButton;
-            let textClass = isActive ? "text-black" : "text-white";
+          {profileTabs.map((tab, index) => {
+            let isActive = tab === activeButton;
             return (
               <TouchableOpacity
-                // onPress={() => setActiveButton(button)}
+                onPress={() => setActiveButton(tab)}
                 key={index}
+                className="mr-6 pb-3"
                 style={{
-                  backgroundColor: isActive ? "white" : "rgba(255,255,255,0.1)",
+                  borderBottomWidth: isActive ? 2 : 0,
+                  borderBottomColor: isActive ? "white" : "transparent",
                 }}
-                className="rounded-md p-1 px-3 mr-2"
               >
-                <Text className={textClass}>{button}</Text>
+                <Text className={isActive ? "text-white font-semibold" : "text-zinc-400"}>
+                  {tab}
+                </Text>
               </TouchableOpacity>
             );
           })}
         </ScrollView>
       </View>
 
-      <View>
-        <Text className="text-white ml-5 mt-5 font-bold text-lg">HISTORY</Text>
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          className="px-4"
-        >
-          {videos && videos[2] && (
-            <View className="mr-4">
-              <VideoCard video={videos[2]} />
+      {/* Content based on active tab */}
+      <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
+        {activeButton === "Videos" && (
+          <View className="px-4 mt-4">
+            <View className="flex-row justify-between items-center mb-4">
+              <Text className="text-white font-semibold text-base">
+                {isOwnChannel ? "Your Videos" : "Uploads"}
+              </Text>
+              <TouchableOpacity>
+                <Icon.Filter stroke="white" strokeWidth={2} height={20} />
+              </TouchableOpacity>
             </View>
-          )}
-          {videos && videos[4] && (
-            <View className="mr-4">
-              <VideoCard video={videos[4]} />
-            </View>
-          )}
-          {videos && videos[6] && (
-            <View className="mr-4">
-              <VideoCard video={videos[6]} />
-            </View>
-          )}
-        </ScrollView>
-      </View>
+            
+            {/* Video Grid */}
+            {videos && videos.length > 0 ? (
+              videos.map((video, index) => (
+                <View key={index} className="mb-4">
+                  <Image 
+                    source={video.thumbnail} 
+                    className="w-full h-48 rounded-lg"
+                  />
+                  <View className="flex-row mt-2">
+                    <View className="flex-1">
+                      <Text className="text-white font-semibold text-base" numberOfLines={2}>
+                        {video.title}
+                      </Text>
+                      <Text className="text-zinc-400 text-sm mt-1">
+                        {video.viewCount ? `${(video.viewCount / 1000).toFixed(0)}K views` : "No views"} • {video.publishedText || "Recently"}
+                      </Text>
+                    </View>
+                    <TouchableOpacity className="ml-2">
+                      <Icon.MoreVertical stroke="white" strokeWidth={2} height={20} />
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              ))
+            ) : (
+              <View className="items-center justify-center py-10">
+                <Icon.Film stroke="white" strokeWidth={1} height={60} width={60} />
+                <Text className="text-zinc-400 text-center mt-4">
+                  {isOwnChannel ? "No videos uploaded yet" : "This channel has no videos"}
+                </Text>
+              </View>
+            )}
+          </View>
+        )}
 
-      <View>
-        <TouchableOpacity className="flex-row">
-          <Image
-            source={require("../assets/images/youtube-image-better.avif")}
-            className="h-7 w-7 mt-3 ml-3 rounded-full"
-          />
-          <Text className="text-white ml-3 mt-5 font-bold">Your Videos</Text>
-        </TouchableOpacity>
-      </View>
+        {activeButton === "Shorts" && (
+          <View className="items-center justify-center py-20">
+            <Icon.Film stroke="white" strokeWidth={1} height={60} width={60} />
+            <Text className="text-zinc-400 text-center mt-4">
+              No shorts available
+            </Text>
+          </View>
+        )}
 
-      <View className="border-t-2 mt-5 border-gray-600">
-        <TouchableOpacity className="ml-3 mt-3">
-          <Text className="text-white mt-3 font-bold">Your movies & TV</Text>
-        </TouchableOpacity>
-        <TouchableOpacity className="ml-3 mt-3">
-          <Text className="text-white mt-3 font-bold">Get Youtube Premium</Text>
-        </TouchableOpacity>
-        <View className="border-t-2 mt-5 border-gray-600" />
-        <TouchableOpacity className="ml-3 mt-3">
-          <Text className="text-white mt-3 font-bold">Time Watched</Text>
-        </TouchableOpacity>
-        <TouchableOpacity className="ml-3 mt-3">
-          <Text className="text-white mt-3 font-bold">Help & Feedback</Text>
-        </TouchableOpacity>
-      </View>
+        {activeButton === "Playlists" && (
+          <View className="items-center justify-center py-20">
+            <Icon.List stroke="white" strokeWidth={1} height={60} width={60} />
+            <Text className="text-zinc-400 text-center mt-4">
+              No playlists created
+            </Text>
+          </View>
+        )}
+
+        {activeButton === "About" && (
+          <View className="px-4 mt-4">
+            <Text className="text-white font-semibold text-lg mb-3">Description</Text>
+            <Text className="text-zinc-400 text-base leading-6 mb-6">
+              Welcome to my channel! I create content about technology, coding, and more.
+            </Text>
+            
+            <View className="border-t border-zinc-700 pt-4">
+              <View className="flex-row items-center mb-3">
+                <Icon.Mail stroke="white" strokeWidth={2} height={18} width={18} />
+                <Text className="text-zinc-400 text-sm ml-3">
+                  For business inquiries: contact@lukaskoenig.com
+                </Text>
+              </View>
+              <View className="flex-row items-center mb-3">
+                <Icon.MapPin stroke="white" strokeWidth={2} height={18} width={18} />
+                <Text className="text-zinc-400 text-sm ml-3">
+                  United States
+                </Text>
+              </View>
+              <View className="flex-row items-center">
+                <Icon.Calendar stroke="white" strokeWidth={2} height={18} width={18} />
+                <Text className="text-zinc-400 text-sm ml-3">
+                  Joined Mar 15, 2020
+                </Text>
+              </View>
+            </View>
+          </View>
+        )}
+      </ScrollView>
     </View>
   );
 }

@@ -9,10 +9,12 @@ import VideoCard from "../components/videoCard";
 import { fetchTrendingVideos } from "../api/youtube";
 import { StatusBar } from "expo-status-bar";
 import { useNavigation } from "@react-navigation/native";
+import ProfileMenu from "../components/profileMenu";
 
 export default function HomeScreen() {
   const [activeCategory, setActiveCategory] = useState("All");
   const [videos, setVideos] = useState([]);
+  const [showProfileMenu, setShowProfileMenu] = useState(false);
   const navigation = useNavigation();
 
   useEffect(() => {
@@ -25,13 +27,17 @@ export default function HomeScreen() {
     setVideos(data);
   };
 
-  const goToProfile = () => {
-    navigation.navigate("Profile");
+  const toggleProfileMenu = () => {
+    setShowProfileMenu(!showProfileMenu);
   };
 
   return (
     <View style={{ backgroundColor: themeColors.bg }} className="flex-1">
       <StatusBar style="light" />
+      <ProfileMenu
+        visible={showProfileMenu}
+        onClose={() => setShowProfileMenu(false)}
+      />
       <SafeAreaView className="flex-row justify-between mx-4">
         <View className="flex-row items-center space-x-1">
           <Image
@@ -42,17 +48,17 @@ export default function HomeScreen() {
             YouTube
           </Text>
         </View>
-        <TouchableOpacity onPress={goToProfile} style={{ padding: 5 }}>
-          <View className="flex-row items-center space-x-3">
-            <Icon.Cast stroke="white" strokeWidth={1.2} height="22" />
-            <Icon.Bell stroke="white" strokeWidth={1.2} height="22" />
-            <Icon.Search stroke="white" strokeWidth={1.2} height="22" />
+        <View className="flex-row items-center space-x-3">
+          <Icon.Cast stroke="white" strokeWidth={1.2} height="22" />
+          <Icon.Bell stroke="white" strokeWidth={1.2} height="22" />
+          <Icon.Search stroke="white" strokeWidth={1.2} height="22" />
+          <TouchableOpacity onPress={toggleProfileMenu}>
             <Image
               source={require("../assets/images/avatar.jpg")}
               className="h-7 w-7 rounded-full"
             />
-          </View>
-        </TouchableOpacity>
+          </TouchableOpacity>
+        </View>
       </SafeAreaView>
 
       <ScrollView className="flex-1 -mt-6" showsVerticalScrollIndicator={false}>
