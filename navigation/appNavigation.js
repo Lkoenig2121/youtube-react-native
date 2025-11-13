@@ -3,6 +3,7 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import HomeScreen from "../screens/HomeScreen";
 import Profile from "../screens/ProfileScreen";
+import VideoPlayerScreen from "../screens/VideoPlayerScreen";
 import { LogBox } from "react-native";
 
 const Stack = createNativeStackNavigator();
@@ -24,6 +25,11 @@ export default function AppNavigation() {
           name="Profile"
           options={{ headerShown: false }}
           component={Profile}
+        />
+        <Stack.Screen
+          name="VideoPlayer"
+          options={{ headerShown: false }}
+          component={VideoPlayerScreen}
         />
       </Stack.Navigator>
     </NavigationContainer>

@@ -99,7 +99,7 @@ export default function HomeScreen() {
         </View>
 
         {/* suggested Video */}
-        {videos && videos[4] && <VideoCard video={videos[4]} />}
+        {videos && videos[4] && <VideoCard video={videos[4]} relatedVideos={videos} />}
 
         {/* short videos */}
         <View className="mt-2 py-5 space-y-3 border-t-zinc-700 border-b-zinc-700 border-4 border-l-0 border-r-0">
@@ -127,7 +127,7 @@ export default function HomeScreen() {
         <View>
           {videos && videos.length > 0 ? (
             videos.map((video, index) => (
-              <VideoCard video={video} key={index} />
+              <VideoCard video={video} relatedVideos={videos} key={index} />
             ))
           ) : (
             <View className="items-center justify-center py-10">

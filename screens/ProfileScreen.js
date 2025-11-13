@@ -166,7 +166,15 @@ export default function ProfileScreen({ route }) {
             {/* Video Grid */}
             {videos && videos.length > 0 ? (
               videos.map((video, index) => (
-                <View key={index} className="mb-4">
+                <TouchableOpacity 
+                  key={index} 
+                  className="mb-4"
+                  onPress={() => navigation.navigate('VideoPlayer', {
+                    video: video,
+                    relatedVideos: videos
+                  })}
+                  activeOpacity={0.9}
+                >
                   <Image 
                     source={video.thumbnail} 
                     className="w-full h-48 rounded-lg"
@@ -180,11 +188,11 @@ export default function ProfileScreen({ route }) {
                         {video.viewCount ? `${(video.viewCount / 1000).toFixed(0)}K views` : "No views"} • {video.publishedText || "Recently"}
                       </Text>
                     </View>
-                    <TouchableOpacity className="ml-2">
+                    <TouchableOpacity className="ml-2" onPress={(e) => e.stopPropagation()}>
                       <Icon.MoreVertical stroke="white" strokeWidth={2} height={20} />
                     </TouchableOpacity>
                   </View>
-                </View>
+                </TouchableOpacity>
               ))
             ) : (
               <View className="items-center justify-center py-10">
